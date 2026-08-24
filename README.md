@@ -1,4 +1,4 @@
-# Transit SQL / NoSQL Benchmark
+# Data SQL / NoSQL Benchmark
 
 Ce projet compare PostgreSQL et MongoDB sur un même jeu de données synthétique de transport. Il couvre la génération, le chargement, l'indexation et des requêtes analytiques équivalentes. Chaque mesure est répétée et la médiane est affichée pour limiter l'effet du bruit.
 
@@ -26,24 +26,17 @@ docker compose up -d
 .\.venv\Scripts\python.exe -m src.benchmark --repetitions 7
 ```
 
-## Résultats
+Les chiffres ne sont pas préremplis : ils dépendent du matériel, des caches et des versions des bases. Une comparaison sérieuse doit conserver les versions, le volume et le nombre de répétitions avec les résultats.
 
-Mesures obtenues localement sur 50 000 événements. Chaque requête a été exécutée une fois pour réchauffer les caches, puis sept fois ; le tableau présente la médiane.
+Le script affiche désormais automatiquement la version de Python, les versions de PostgreSQL et MongoDB, le nombre de processeurs logiques, le volume de données et le nombre de répétitions avant les résultats. Pour une publication, compléter avec le modèle exact du processeur et la mémoire vive de la machine.
 
-| Requête | PostgreSQL | MongoDB | Rapport MongoDB/PostgreSQL |
-|---|---:|---:|---:|
-| Agrégation des retards par ligne | 16,718 ms | 40,631 ms | 2,43× |
-| Moyenne des passagers par station et fenêtre temporelle | 1,514 ms | 3,900 ms | 2,58× |
+## Résultats mesurés le 25 août 2026
 
-PostgreSQL est donc environ 2,4 à 2,6 fois plus rapide sur ces deux scénarios. Le second cas bénéficie directement de l'index composé `(station_id, recorded_at)`. Ces résultats ne signifient pas que PostgreSQL est toujours plus rapide : ils décrivent seulement ce volume, ces modèles de données, ces index et cette machine.
+Configuration : Lenovo 81Y4, Intel Core i5-10300H (4 cœurs / 8 threads, 2,50 GHz), 8 Go de RAM, Windows 10 Professionnel, Python 3.10.11, PostgreSQL 17.11 et MongoDB 8.2.12. Jeu de données : 50 000 événements. Chaque requête comprend un échauffement puis 7 mesures ; la médiane est retenue.
 
-## Reproduire les mesures
+| Scénario | PostgreSQL | MongoDB | Rapport MongoDB / PostgreSQL |
+| --- | ---: | ---: | ---: |
+| Agrégation par ligne | 18,764 ms | 31,562 ms | 1,68x |
+| Fenêtre station/date | 1,181 ms | 2,959 ms | 2,51x |
 
-Pour comparer correctement une autre configuration, il faut conserver le volume de données et le nombre de répétitions, puis noter le matériel ainsi que les versions de PostgreSQL et MongoDB. Les caches, les processus actifs et le stockage peuvent modifier les temps obtenus.
-
-Pour arrêter les bases après le benchmark :
-
-```powershell
-docker compose down
-```
-
+Sur cette machine et ces deux requêtes, PostgreSQL est donc **1,68 à 2,51 fois plus rapide**. Ces résultats décrivent ce protocole précis et ne constituent pas une conclusion générale sur les deux bases.

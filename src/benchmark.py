@@ -1,5 +1,7 @@
 import argparse
+import json
 import os
+import platform
 import statistics
 import time
 
@@ -32,9 +34,27 @@ def median_time(callable_, repetitions=7):
 
 
 def run(postgres_dsn: str, mongo_uri: str, repetitions: int = 7):
-    mongo = MongoClient(mongo_uri).benchmark.transit_events
+    mongo_client = MongoClient(mongo_uri)
+    mongo = mongo_client.benchmark.transit_events
     results = []
     with psycopg.connect(postgres_dsn) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT version()")
+            postgres_version = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM transit_events")
+            row_count = cursor.fetchone()[0]
+        mongo_version = mongo_client.server_info()["version"]
+        environment = {
+            "platform": platform.platform(),
+            "processor": platform.processor(),
+            "logical_cpu_count": os.cpu_count(),
+            "python": platform.python_version(),
+            "postgresql": postgres_version,
+            "mongodb": mongo_version,
+            "rows": row_count,
+            "repetitions": repetitions,
+        }
+        print(json.dumps(environment, indent=2, ensure_ascii=False))
         for name in SQL:
             def sql_call(query=SQL[name]):
                 with connection.cursor() as cursor:
