@@ -1,5 +1,9 @@
 # Data SQL / NoSQL Benchmark
 
+[![Tests](https://github.com/nassirchaabani/transit-sql-nosql-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/nassirchaabani/transit-sql-nosql-benchmark/actions/workflows/ci.yml)
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Ce projet compare PostgreSQL et MongoDB sur un même jeu de données synthétique de transport. Il couvre la génération, le chargement, l'indexation et des requêtes analytiques équivalentes. Chaque mesure est répétée et la médiane est affichée pour limiter l'effet du bruit.
 
 ## Prérequis
